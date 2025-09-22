@@ -2,7 +2,7 @@
 <h2 align="center">Service for declension of Ukrainian military ranks and appointments</h2>
 
 ## Usage
-Send a post request. Body example: 
+Send a post request to root. Body example: 
 ```
 {
   "grammaticalCase": "родовий",

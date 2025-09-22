@@ -32,12 +32,16 @@ async function toGrammaticalCase({ grammaticalCase, personData }) {
   }
 }
 
+const toGrammaticalCaseAll = async (data) => Array.isArray(data) ?
+  Promise.all(data.map(item => toGrammaticalCase(item))) : 
+  toGrammaticalCase(data);
+
 app.get("/", (req, res) => {
   res.send('express-shevchenko');
 });
 
 app.post('/', (req, res) => {
-  toGrammaticalCase(req.body).then(result => res.send(result));
+  toGrammaticalCaseAll(req.body).then(result => res.send(result));
 });
 
 module.exports = app;

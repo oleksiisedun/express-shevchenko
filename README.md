@@ -21,34 +21,34 @@ Decline a person's name and military fields into a Ukrainian grammatical case.
 
 #### Request body
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `grammaticalCase` | string | yes | Target grammatical case (see [Supported cases](#supported-grammatical-cases)) |
-| `personData` | object | yes | Person descriptor (see [Person fields](#person-fields)) |
+| Field             | Type   | Required | Description                                                                   |
+| ----------------- | ------ | -------- | ----------------------------------------------------------------------------- |
+| `grammaticalCase` | string | yes      | Target grammatical case (see [Supported cases](#supported-grammatical-cases)) |
+| `personData`      | object | yes      | Person descriptor (see [Person fields](#person-fields))                       |
 
 #### Person fields (`personData`)
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `gender` | string | yes | `"ч"` / `"masculine"` or `"ж"` / `"feminine"` |
-| `familyName` | string | no | Last name |
-| `givenName` | string | no | First name |
-| `patronymicName` | string | no | Patronymic |
-| `militaryRank` | string | no | Military rank (e.g. `"солдат"`, `"полковник"`) |
-| `militaryAppointment` | string | no | Full appointment title |
+| Field                 | Type   | Required | Description                                    |
+| --------------------- | ------ | -------- | ---------------------------------------------- |
+| `gender`              | string | yes      | `"ч"` / `"masculine"` or `"ж"` / `"feminine"`  |
+| `familyName`          | string | no       | Last name                                      |
+| `givenName`           | string | no       | First name                                     |
+| `patronymicName`      | string | no       | Patronymic                                     |
+| `militaryRank`        | string | no       | Military rank (e.g. `"солдат"`, `"полковник"`) |
+| `militaryAppointment` | string | no       | Full appointment title                         |
 
 At least one name or rank field should be provided.
 
 #### Supported grammatical cases
 
-| Value | Case |
-|---|---|
-| `родовий` | Genitive |
-| `давальний` | Dative |
-| `знахідний` | Accusative |
-| `орудний` | Ablative (Instrumental) |
-| `місцевий` | Locative |
-| `кличний` | Vocative |
+| Value       | Case                    |
+| ----------- | ----------------------- |
+| `родовий`   | Genitive                |
+| `давальний` | Dative                  |
+| `знахідний` | Accusative              |
+| `орудний`   | Ablative (Instrumental) |
+| `місцевий`  | Locative                |
+| `кличний`   | Vocative                |
 
 ---
 
@@ -57,6 +57,7 @@ At least one name or rank field should be provided.
 ### Single person
 
 **Request:**
+
 ```json
 POST /
 {
@@ -73,6 +74,7 @@ POST /
 ```
 
 **Response:**
+
 ```json
 {
   "givenName": "Тараса",
@@ -90,6 +92,7 @@ POST /
 Send an array of objects to decline multiple people in one request.
 
 **Request:**
+
 ```json
 POST /
 [
@@ -131,6 +134,7 @@ All errors return HTTP `400` with a JSON body:
 ```
 
 Common errors:
+
 - Missing `grammaticalCase` or `personData`
 - Unknown grammatical case value
 
@@ -140,10 +144,19 @@ Common errors:
 
 ```bash
 npm install
-node api/index.js
+npm start
 ```
 
 The server listens on the port defined by the `PORT` environment variable (default: `3000`).
+
+## Development
+
+```bash
+npm test           # unit tests (node --test)
+npm run lint       # ESLint
+npm run format     # Prettier (auto-fix)
+npm run check      # lint + format:check + test
+```
 
 ---
 

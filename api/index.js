@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require('express');
 const shevchenko = require('shevchenko');
 const { militaryExtension } = require('shevchenko-ext-military');
 
@@ -13,12 +13,12 @@ app.use(express.json());
  * @type {Record<string, (data: object) => Promise<object>>}
  */
 const CASE_HANDLERS = {
-  'родовий': (data) => shevchenko.inGenitive(data),
-  'давальний': (data) => shevchenko.inDative(data),
-  'знахідний': (data) => shevchenko.inAccusative(data),
-  'орудний': (data) => shevchenko.inAblative(data),
-  'місцевий': (data) => shevchenko.inLocative(data),
-  'кличний': (data) => shevchenko.inVocative(data),
+  родовий: (data) => shevchenko.inGenitive(data),
+  давальний: (data) => shevchenko.inDative(data),
+  знахідний: (data) => shevchenko.inAccusative(data),
+  орудний: (data) => shevchenko.inAblative(data),
+  місцевий: (data) => shevchenko.inLocative(data),
+  кличний: (data) => shevchenko.inVocative(data),
 };
 
 /**
@@ -26,8 +26,8 @@ const CASE_HANDLERS = {
  * @type {Record<string, string>}
  */
 const GENDER_MAP = {
-  'ч': 'masculine',
-  'ж': 'feminine',
+  ч: 'masculine',
+  ж: 'feminine',
 };
 
 /**
@@ -52,7 +52,9 @@ async function toGrammaticalCase({ grammaticalCase, personData }) {
 
   const handler = CASE_HANDLERS[grammaticalCase.toLowerCase()];
   if (!handler) {
-    throw new Error(`Unknown grammatical case: "${grammaticalCase}". Valid cases: ${Object.keys(CASE_HANDLERS).join(', ')}`);
+    throw new Error(
+      `Unknown grammatical case: "${grammaticalCase}". Valid cases: ${Object.keys(CASE_HANDLERS).join(', ')}`,
+    );
   }
 
   return handler(normalizePersonData(personData));
@@ -64,7 +66,7 @@ async function toGrammaticalCase({ grammaticalCase, personData }) {
  * @param {import('express').Response} res
  * @returns {void}
  */
-app.get("/", (req, res) => {
+app.get('/', (req, res) => {
   res.send('express-shevchenko');
 });
 
@@ -83,7 +85,7 @@ app.post('/', async (req, res) => {
 
   try {
     const result = Array.isArray(body)
-      ? await Promise.all(body.map(item => toGrammaticalCase(item)))
+      ? await Promise.all(body.map((item) => toGrammaticalCase(item)))
       : await toGrammaticalCase(body);
     res.json(result);
   } catch (e) {

@@ -75,12 +75,11 @@ POST /
 **Response:**
 ```json
 {
-  "gender": "masculine",
-  "militaryRank": "солдата",
-  "militaryAppointment": "старшого стрільця 2-го відділення...",
-  "familyName": "Шевченка",
   "givenName": "Тараса",
-  "patronymicName": "Федоровича"
+  "patronymicName": "Федоровича",
+  "familyName": "Шевченка",
+  "militaryRank": "солдата",
+  "militaryAppointment": "старшого стрільця 2-го відділення 2-го взводу оперативного призначення 7-ої роти оперативного призначення (на бронетранспортерах) 3-го батальйону оперативного призначення"
 }
 ```
 
@@ -118,6 +117,8 @@ POST /
 ```
 
 **Response:** an array of declined person objects in the same order.
+
+If any item in the batch is invalid, the whole request fails with a single `400` error — there is no partial success.
 
 ---
 

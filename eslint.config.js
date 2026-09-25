@@ -16,5 +16,8 @@ module.exports = [
         fetch: 'readonly',
       },
     },
+    rules: {
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
   },
 ];

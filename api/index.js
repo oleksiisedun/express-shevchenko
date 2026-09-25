@@ -36,17 +36,20 @@ const GENDER_MAP = {
  * @returns {object}
  */
 function normalizePersonData(personData) {
-  const gender = GENDER_MAP[personData.gender?.toLowerCase()] ?? personData.gender;
-  return { ...personData, gender };
+  const { gender } = personData;
+  const normalizedGender =
+    typeof gender === 'string' ? (GENDER_MAP[gender.toLowerCase()] ?? gender) : gender;
+  return { ...personData, gender: normalizedGender };
 }
 
 /**
  * Declines a single person's data into the requested Ukrainian grammatical case.
- * @param {{ grammaticalCase: string, personData: object }} params
+ * @param {{ grammaticalCase: string, personData: object } | null} item
  * @returns {Promise<object>}
  */
-async function toGrammaticalCase({ grammaticalCase, personData }) {
-  if (!grammaticalCase || !personData) {
+async function toGrammaticalCase(item) {
+  const { grammaticalCase, personData } = item ?? {};
+  if (typeof grammaticalCase !== 'string' || !personData || typeof personData !== 'object') {
     throw new Error('grammaticalCase and personData are required');
   }
 
@@ -91,6 +94,20 @@ app.post('/', async (req, res) => {
   } catch (e) {
     res.status(400).json({ error: e.message });
   }
+});
+
+/**
+ * Returns every error (including malformed JSON from express.json) as a JSON body.
+ * @param {Error & { status?: number, expose?: boolean }} err
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} _next
+ * @returns {void}
+ */
+app.use((err, req, res, _next) => {
+  const status = err.status ?? 500;
+  if (status >= 500) console.error(err);
+  res.status(status).json({ error: err.expose ? err.message : 'Internal server error' });
 });
 
 if (require.main === module) {

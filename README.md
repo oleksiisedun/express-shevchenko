@@ -127,7 +127,7 @@ If any item in the batch is invalid, the whole request fails with a single `400`
 
 ## Error responses
 
-All errors return HTTP `400` with a JSON body:
+All errors return a JSON body — HTTP `400` for invalid requests, `500` for unexpected server errors:
 
 ```json
 { "error": "..." }
@@ -135,8 +135,10 @@ All errors return HTTP `400` with a JSON body:
 
 Common errors:
 
-- Missing `grammaticalCase` or `personData`
+- Missing `grammaticalCase` or `personData` (or not a string / object)
 - Unknown grammatical case value
+- Invalid or missing `gender`
+- Malformed JSON body
 
 ---
 

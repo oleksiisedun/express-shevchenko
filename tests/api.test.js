@@ -110,3 +110,32 @@ test('POST / fails the whole batch when one item is invalid', async () => {
   assert.equal(res.status, 400);
   assert.deepEqual(await res.json(), { error: 'grammaticalCase and personData are required' });
 });
+
+test('POST / rejects wrongly typed input without leaking internal errors', async () => {
+  const cases = [
+    { grammaticalCase: 5, personData: { gender: 'ч', familyName: 'Шевченко' } },
+    { grammaticalCase: 'родовий', personData: 'Шевченко' },
+    [null],
+  ];
+  for (const body of cases) {
+    const res = await postJson(body);
+    assert.equal(res.status, 400);
+    assert.deepEqual(await res.json(), { error: 'grammaticalCase and personData are required' });
+  }
+});
+
+test('POST / passes a non-string gender through to shevchenko validation', async () => {
+  const res = await postJson({
+    grammaticalCase: 'родовий',
+    personData: { gender: 1, familyName: 'Шевченко' },
+  });
+  assert.equal(res.status, 400);
+  assert.match((await res.json()).error, /"gender" parameter must be one of/);
+});
+
+test('POST / returns malformed JSON errors as JSON, not HTML', async () => {
+  const res = await postJson('{bad', { raw: true });
+  assert.equal(res.status, 400);
+  assert.match(res.headers.get('content-type'), /application\/json/);
+  assert.ok((await res.json()).error);
+});

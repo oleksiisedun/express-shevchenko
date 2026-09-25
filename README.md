@@ -156,9 +156,10 @@ The server listens on the port defined by the `PORT` environment variable (defau
 ```bash
 npm test              # unit tests (node --test)
 npm run lint          # ESLint (incl. required JSDoc in api/)
+npm run typecheck     # tsc type check of JSDoc types (checkJs)
 npm run format:check  # Prettier (check only)
 npm run format        # Prettier (auto-fix)
-npm run check         # lint + format:check + test
+npm run check         # lint + typecheck + format:check + test
 ```
 
 ---

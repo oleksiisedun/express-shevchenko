@@ -83,3 +83,30 @@ test('POST / rejects an empty batch array', async () => {
   assert.equal(res.status, 400);
   assert.deepEqual(await res.json(), { error: 'Request body is required' });
 });
+
+test('POST / normalizes the feminine short code and accepts any letter case', async () => {
+  const res = await postJson({
+    grammaticalCase: 'Родовий',
+    personData: { gender: 'Ж', familyName: 'Мельник', givenName: 'Олена' },
+  });
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { givenName: 'Олени', familyName: 'Мельник' });
+});
+
+test('POST / declines military fields via shevchenko-ext-military', async () => {
+  const res = await postJson({
+    grammaticalCase: 'родовий',
+    personData: { gender: 'ч', militaryRank: 'солдат' },
+  });
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { militaryRank: 'солдата' });
+});
+
+test('POST / fails the whole batch when one item is invalid', async () => {
+  const res = await postJson([
+    { grammaticalCase: 'родовий', personData: { gender: 'ч', familyName: 'Шевченко' } },
+    { grammaticalCase: 'родовий' },
+  ]);
+  assert.equal(res.status, 400);
+  assert.deepEqual(await res.json(), { error: 'grammaticalCase and personData are required' });
+});

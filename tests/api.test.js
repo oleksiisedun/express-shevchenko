@@ -15,6 +15,20 @@ after(() => {
   server.close();
 });
 
+/**
+ * POSTs a JSON payload (or a raw string body) to the API root.
+ * @param {unknown} body
+ * @param {{ raw?: boolean }} [options]
+ * @returns {Promise<Response>}
+ */
+function postJson(body, { raw = false } = {}) {
+  return fetch(baseUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: raw ? body : JSON.stringify(body),
+  });
+}
+
 test('GET / returns the health check message', async () => {
   const res = await fetch(`${baseUrl}/`);
   assert.equal(res.status, 200);
@@ -22,62 +36,42 @@ test('GET / returns the health check message', async () => {
 });
 
 test('POST / declines a single person into the requested case', async () => {
-  const res = await fetch(baseUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      grammaticalCase: 'родовий',
-      personData: { gender: 'masculine', familyName: 'Шевченко', givenName: 'Тарас' },
-    }),
+  const res = await postJson({
+    grammaticalCase: 'родовий',
+    personData: { gender: 'masculine', familyName: 'Шевченко', givenName: 'Тарас' },
   });
   assert.equal(res.status, 200);
   assert.deepEqual(await res.json(), { familyName: 'Шевченка', givenName: 'Тараса' });
 });
 
 test('POST / declines a batch array in order', async () => {
-  const res = await fetch(baseUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify([
-      { grammaticalCase: 'родовий', personData: { gender: 'masculine', familyName: 'Шевченко' } },
-      { grammaticalCase: 'кличний', personData: { gender: 'feminine', familyName: 'Мельник' } },
-    ]),
-  });
+  const res = await postJson([
+    { grammaticalCase: 'родовий', personData: { gender: 'masculine', familyName: 'Шевченко' } },
+    { grammaticalCase: 'кличний', personData: { gender: 'feminine', familyName: 'Мельник' } },
+  ]);
   assert.equal(res.status, 200);
   assert.deepEqual(await res.json(), [{ familyName: 'Шевченка' }, { familyName: 'Мельник' }]);
 });
 
 test('POST / normalizes short Ukrainian gender codes before declining', async () => {
-  const shortCode = await fetch(baseUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      grammaticalCase: 'родовий',
-      personData: { gender: 'ч', familyName: 'Шевченко' },
-    }),
+  const shortCode = await postJson({
+    grammaticalCase: 'родовий',
+    personData: { gender: 'ч', familyName: 'Шевченко' },
   });
   assert.equal(shortCode.status, 200);
   assert.deepEqual(await shortCode.json(), { familyName: 'Шевченка' });
 });
 
 test('POST / rejects a request missing personData', async () => {
-  const res = await fetch(baseUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ grammaticalCase: 'родовий' }),
-  });
+  const res = await postJson({ grammaticalCase: 'родовий' });
   assert.equal(res.status, 400);
   assert.deepEqual(await res.json(), { error: 'grammaticalCase and personData are required' });
 });
 
 test('POST / rejects an unknown grammatical case', async () => {
-  const res = await fetch(baseUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      grammaticalCase: 'орудний2',
-      personData: { gender: 'masculine', familyName: 'Шевченко' },
-    }),
+  const res = await postJson({
+    grammaticalCase: 'орудний2',
+    personData: { gender: 'masculine', familyName: 'Шевченко' },
   });
   assert.equal(res.status, 400);
   const body = await res.json();
@@ -85,11 +79,7 @@ test('POST / rejects an unknown grammatical case', async () => {
 });
 
 test('POST / rejects an empty batch array', async () => {
-  const res = await fetch(baseUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify([]),
-  });
+  const res = await postJson([]);
   assert.equal(res.status, 400);
   assert.deepEqual(await res.json(), { error: 'Request body is required' });
 });

@@ -69,9 +69,9 @@ async function toGrammaticalCase(item) {
  * @param {import('express').Response} res
  * @returns {void}
  */
-app.get('/', (req, res) => {
+function healthCheck(req, res) {
   res.send('express-shevchenko');
-});
+}
 
 /**
  * Declines one person, or each person in a batch array, into their requested grammatical case.
@@ -79,7 +79,7 @@ app.get('/', (req, res) => {
  * @param {import('express').Response} res
  * @returns {Promise<void>}
  */
-app.post('/', async (req, res) => {
+async function declineHandler(req, res) {
   const body = req.body;
 
   if (!body || (Array.isArray(body) && body.length === 0)) {
@@ -94,7 +94,7 @@ app.post('/', async (req, res) => {
   } catch (e) {
     res.status(400).json({ error: e.message });
   }
-});
+}
 
 /**
  * Returns every error (including malformed JSON from express.json) as a JSON body.
@@ -104,11 +104,15 @@ app.post('/', async (req, res) => {
  * @param {import('express').NextFunction} _next
  * @returns {void}
  */
-app.use((err, req, res, _next) => {
+function jsonErrorHandler(err, req, res, _next) {
   const status = err.status ?? 500;
   if (status >= 500) console.error(err);
   res.status(status).json({ error: err.expose ? err.message : 'Internal server error' });
-});
+}
+
+app.get('/', healthCheck);
+app.post('/', declineHandler);
+app.use(jsonErrorHandler);
 
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;

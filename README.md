@@ -154,10 +154,11 @@ The server listens on the port defined by the `PORT` environment variable (defau
 ## Development
 
 ```bash
-npm test           # unit tests (node --test)
-npm run lint       # ESLint
-npm run format     # Prettier (auto-fix)
-npm run check      # lint + format:check + test
+npm test              # unit tests (node --test)
+npm run lint          # ESLint (incl. required JSDoc in api/)
+npm run format:check  # Prettier (check only)
+npm run format        # Prettier (auto-fix)
+npm run check         # lint + format:check + test
 ```
 
 ---
